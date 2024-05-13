@@ -19,7 +19,7 @@ Please note that there are differences between this repository and the official 
 
 - [x] Enable specifying the model to use (only writer agent)
 - [x] Implement search history functionality
-- [ ] Develop features for sharing results
+- [x] Develop features for sharing results
 - [ ] Add video support for search functionality
 - [ ] Implement RAG support
 - [ ] Introduce tool support for enhanced productivity
@@ -104,6 +104,8 @@ Host your own live version of Morphic with Vercel or Cloudflare Pages.
 5. Save and deploy.
 6. Cancel deployment, go to `Settings` -> `Functions` -> `Compatibility flags`, add `nodejs_compat` to preview and production.
 7. Redeploy.
+
+**The build error needs to be fixed: [issue](https://github.com/miurla/morphic/issues/114)**
 
 ## ✅ Verified models
 
