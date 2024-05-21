@@ -6,9 +6,9 @@ import {
   streamText as nonexperimental_streamText
 } from 'ai'
 import { Section } from '@/components/section'
-import { OpenAI } from '@ai-sdk/openai'
 import { BotMessage } from '@/components/message'
 import { getTools } from './tools'
+import { getModel } from '../utils'
 
 export async function researcher(
   uiStream: ReturnType<typeof createStreamableUI>,
@@ -16,12 +16,6 @@ export async function researcher(
   messages: CoreMessage[],
   useSpecificModel?: boolean
 ) {
-  const openai = new OpenAI({
-    baseUrl: process.env.OPENAI_API_BASE, // optional base URL for proxies etc.
-    apiKey: process.env.OPENAI_API_KEY, // optional API key, default to env property OPENAI_API_KEY
-    organization: '' // optional organization
-  })
-
   let fullResponse = ''
   let hasError = false
   const answerSection = (
@@ -31,9 +25,9 @@ export async function researcher(
   )
 
   let isFirstToolResponse = true
-  const currentDate = new Date().toLocaleString();
+  const currentDate = new Date().toLocaleString()
   const result = await nonexperimental_streamText({
-    model: openai.chat(process.env.OPENAI_API_MODEL || 'gpt-4o'),
+    model: getModel(),
     maxTokens: 2500,
     system: `As a professional search expert, you possess the ability to search for any information on the web.
     or any information on the web.
@@ -41,12 +35,12 @@ export async function researcher(
     If there are any images relevant to your answer, be sure to include them as well.
     Aim to directly address the user's question, augmenting your response with insights gleaned from the search results.
     Whenever quoting or referencing information from a specific URL, always cite the source URL explicitly.
+    The retrieve tool can only be used with URLs provided by the user. URLs from search results cannot be used.
     Please match the language of the response to the user's language. Current date and time: ${currentDate}`,
     messages,
     tools: getTools({
       uiStream,
       fullResponse,
-      hasError,
       isFirstToolResponse
     })
   })
@@ -73,8 +67,11 @@ export async function researcher(
         break
       case 'tool-result':
         // Append the answer section if the specific model is not used
-        if (!useSpecificModel && toolResponses.length === 0) {
+        if (!useSpecificModel && toolResponses.length === 0 && delta.result) {
           uiStream.append(answerSection)
+        }
+        if (!delta.result) {
+          hasError = true
         }
         toolResponses.push(delta)
         break
