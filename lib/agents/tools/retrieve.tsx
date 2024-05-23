@@ -1,25 +1,15 @@
 import { retrieveSchema } from '@/lib/schema/retrieve'
-import { ToolsProps } from '.'
+import { ToolProps } from '.'
 import { Card } from '@/components/ui/card'
 import { SearchSkeleton } from '@/components/search-skeleton'
 import { SearchResults as SearchResultsType } from '@/lib/types'
 import RetrieveSection from '@/components/retrieve-section'
 
-export const retrieveTool = ({
-  uiStream,
-  fullResponse,
-  isFirstToolResponse
-}: ToolsProps) => ({
+export const retrieveTool = ({ uiStream, fullResponse }: ToolProps) => ({
   description: 'Retrieve content from the web',
   parameters: retrieveSchema,
   execute: async ({ url }: { url: string }) => {
     let hasError = false
-
-    // If this is the first tool response, remove spinner
-    if (isFirstToolResponse) {
-      isFirstToolResponse = false
-      uiStream.update(null)
-    }
     // Append the search section
     uiStream.append(<SearchSkeleton />)
 
@@ -28,7 +18,8 @@ export const retrieveTool = ({
       const response = await fetch(`https://r.jina.ai/${url}`, {
         method: 'GET',
         headers: {
-          Accept: 'application/json'
+          Accept: 'application/json',
+          'X-With-Generated-Alt': 'true'
         }
       })
       const json = await response.json()
