@@ -6,7 +6,7 @@ import {
   getAIState,
   getMutableAIState
 } from 'ai/rsc'
-import { CoreMessage, nanoid, ToolResultPart } from 'ai'
+import { CoreMessage, generateId, ToolResultPart } from 'ai'
 import { Spinner } from '@/components/ui/spinner'
 import { Section } from '@/components/section'
 import { FollowupPanel } from '@/components/followup-panel'
@@ -53,10 +53,13 @@ async function submit(
     })
 
   // goupeiId is used to group the messages for collapse
-  const groupeId = nanoid()
+  const groupeId = generateId()
 
   const useSpecificAPI = process.env.USE_SPECIFIC_API_FOR_WRITER === 'true'
-  const maxMessages = useSpecificAPI ? 5 : 10
+  const useOllamaProvider = !!(
+    process.env.OLLAMA_MODEL && process.env.OLLAMA_BASE_URL
+  )
+  const maxMessages = useSpecificAPI ? 5 : useOllamaProvider ? 1 : 10
   // Limit the number of messages to the maximum
   messages.splice(0, Math.max(messages.length - maxMessages, 0))
   // Get the user input from the form data
@@ -84,7 +87,7 @@ async function submit(
       messages: [
         ...aiState.get().messages,
         {
-          id: nanoid(),
+          id: generateId(),
           role: 'user',
           content,
           type
@@ -113,9 +116,10 @@ async function submit(
         messages: [
           ...aiState.get().messages,
           {
-            id: nanoid(),
+            id: generateId(),
             role: 'assistant',
-            content: `inquiry: ${inquiry?.question}`
+            content: `inquiry: ${inquiry?.question}`,
+            type: 'inquiry'
           }
         ]
       })
@@ -185,10 +189,16 @@ async function submit(
 
     if (!errorOccurred) {
       const useGoogleProvider = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+      const useOllamaProvider = !!(
+        process.env.OLLAMA_MODEL && process.env.OLLAMA_BASE_URL
+      )
       let processedMessages = messages
       // If using Google provider, we need to modify the messages
       if (useGoogleProvider) {
         processedMessages = transformToolMessages(messages)
+      }
+      if (useOllamaProvider) {
+        processedMessages = [{ role: 'assistant', content: answer }]
       }
 
       streamText.done()
@@ -249,7 +259,7 @@ async function submit(
   processEvents()
 
   return {
-    id: nanoid(),
+    id: generateId(),
     isGenerating: isGenerating.value,
     component: uiStream.value,
     isCollapsed: isCollapsed.value
@@ -270,7 +280,7 @@ export type UIState = {
 }[]
 
 const initialAIState: AIState = {
-  chatId: nanoid(),
+  chatId: generateId(),
   messages: []
 }
 
@@ -315,7 +325,7 @@ export const AI = createAI<AIState, UIState>({
     const updatedMessages: AIMessage[] = [
       ...messages,
       {
-        id: nanoid(),
+        id: generateId(),
         role: 'assistant',
         content: `end`,
         type: 'end'
