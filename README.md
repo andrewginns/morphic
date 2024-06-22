@@ -5,7 +5,7 @@ An AI-powered search engine with a generative UI.
 ![capture](/public/capture-240404_blk.png)
 
 > [!NOTE]
-> Please note that there are differences between this repository and the official website [morphic.sh](morphic.sh). The official website is a fork of this repository with additional features such as authentication, which are necessary for providing the service online. The core source code of Morphic resides in this repository, and it's designed to be easily built and deployed.
+> Please note that there are differences between this repository and the official website [morphic.sh](https://morphic.sh). The official website is a fork of this repository with additional features such as authentication, which are necessary for providing the service online. The core source code of Morphic resides in this repository, and it's designed to be easily built and deployed.
 
 ## 🗂️ Overview
 
@@ -26,8 +26,9 @@ An AI-powered search engine with a generative UI.
 - Get answers from specified URLs
 - Use as a search engine [※](#-search-engine)
 - Support for providers other than OpenAI
-  - Google Generative AI Provider support [※](https://github.com/miurla/morphic/issues/192)
-  - Ollama Provider support ([Unstable](https://github.com/miurla/morphic/issues/215))
+  - Google Generative AI Provider [※](https://github.com/miurla/morphic/issues/192)
+  - Anthropic Provider [※](https://github.com/miurla/morphic/pull/239)
+  - Ollama Provider ([Unstable](https://github.com/miurla/morphic/issues/215))
 - Specify the model to generate answers
   - Groq API support [※](https://github.com/miurla/morphic/pull/58)
 
